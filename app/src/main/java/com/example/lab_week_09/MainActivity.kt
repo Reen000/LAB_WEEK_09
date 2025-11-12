@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row // NEW: Required for button layout in HomeContent
+import androidx.compose.foundation.layout.Row // Required for button layout in HomeContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LAB_WEEK_09Theme {
-                // 5. UPDATE: Replace Home() with App() and setup NavController
+                // Replace Home() with App() and setup NavController
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -104,23 +104,19 @@ class MainActivity : ComponentActivity() {
 // NAVIGATION COMPONENTS
 // =================================================================
 
-// NEW: Root Composable (App)
-// This will be the root composable of the app
+// Root Composable (App)
 @Composable
 fun App(navController: NavHostController) {
-    //Here, we use NavHost to create a navigation graph
     NavHost(
         navController = navController,
         startDestination = "home"
     ) {
-        //Here, we create a route called "home"
         composable("home") {
             // Pass the navigation lambda function to Home
             Home { listDataString ->
                 navController.navigate("resultContent/?listData=$listDataString")
             }
         }
-        //Here, we create a route called "resultContent"
         composable(
             "resultContent/?listData={listData}",
             arguments = listOf(navArgument("listData") {
@@ -135,20 +131,16 @@ fun App(navController: NavHostController) {
     }
 }
 
-// 10. NEW: ResultContent Composable
-// ResultContent accepts a String parameter called listData from the Home composable
+// ResultContent Composable
 @Composable
 fun ResultContent(listData: String) {
     Column(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxSize(),
-        // Added alignment for clarity
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Added a title for context
         OnBackgroundTitleText(text = "Result Content")
-        // Display the received list data string
         OnBackgroundItemText(text = listData)
     }
 }
@@ -157,11 +149,10 @@ fun ResultContent(listData: String) {
 // STATE/LOGIC COMPONENTS
 // =================================================================
 
-// 2. State-managing Composable (Home - Parent component)
-// 6. UPDATE: Add navigation parameter
+// State-managing Composable (Home - Parent component)
 @Composable
 fun Home(
-    navigateFromHomeToResult: (String) -> Unit // Accepts a String to pass as argument
+    navigateFromHomeToResult: (String) -> Unit
 ) {
     // List state for the student items
     val listData = remember { mutableStateListOf(
@@ -172,15 +163,14 @@ fun Home(
     // State for the text field input
     var inputField = remember { mutableStateOf(Student("")) }
 
-    // 8. UPDATE: Update calling function for HomeContent
     HomeContent(
         listData,
         inputField.value,
         onInputValueChange = { input ->
-            // Fix: Use named parameter 'name' for copy function
             inputField.value = inputField.value.copy(name = input)
         },
         onButtonClick = {
+            // FIX: Prevent submission if the string is blank or empty
             if (inputField.value.name.isNotBlank()) {
                 listData.add(inputField.value)
                 inputField.value = Student("") // Reset input field
@@ -197,17 +187,15 @@ fun Home(
 // UI COMPONENTS
 // =================================================================
 
-// 3. UI Composable (HomeContent - Child component)
-// 7. UPDATE: Add navigation parameter to HomeContent
+// UI Composable (HomeContent - Child component)
 @Composable
 fun HomeContent(
     listData: SnapshotStateList<Student>,
     inputField: Student,
     onInputValueChange: (String) -> Unit,
     onButtonClick: () -> Unit,
-    navigateFromHomeToResult: () -> Unit // Lambda to trigger navigation
+    navigateFromHomeToResult: () -> Unit
 ) {
-    // 9. UPDATE: Update LazyColumn to include Row and a second button
     LazyColumn {
         // Input Form Item
         item {
@@ -229,7 +217,7 @@ fun HomeContent(
                     onValueChange = onInputValueChange
                 )
 
-                Row { // NEW: Row to hold the two buttons side-by-side
+                Row { // Row to hold the two buttons side-by-side
                     PrimaryTextButton(text = stringResource(id = R.string.button_click)) {
                         onButtonClick()
                     }
